@@ -84,9 +84,18 @@ python manage.py runserver
 
 Ten disponible una herramienta como Postman o cURL para enviar las solicitudes.
 
-### Ejemplo de Pruebas con Postman
 
-#### Paso 1: Insertar Datos en `departments`
+### Cómo Probar la API: Ejemplo de Pruebas con Postman
+
+#### Paso 1: Carga de  Datos en `upload-csv`
+
+Para probar la carga de archivos CSV sin encabezado, utiliza la siguiente URL:
+1. Selecciona el método `POST`.
+2. URL: `http://127.0.0.1:8000/api/upload-csv/` y `http://127.0.0.1:8000/api/upload-csv-no-header/?`table=hired_employees
+3. Ve a la pestaña `Body` y selecciona `form-data`.
+4. Agrega la key file y en value  `adjuntar.csv`.
+
+#### Paso 2: Insertar Datos en `departments`
 
 1. Selecciona el método `POST`.
 2. URL: `http://127.0.0.1:8000/api/batch-insert/`
