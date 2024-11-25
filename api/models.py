@@ -9,6 +9,6 @@ class Job(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(max_length=255)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
     hire_date = models.DateField()
+    department = models.ForeignKey('Department', on_delete=models.CASCADE)  # Clave foránea
+    job = models.ForeignKey('Job', on_delete=models.CASCADE)  # Clave foránea
