@@ -128,22 +128,23 @@ class DepartmentEmployeeCountView(APIView):
 class EmployeesHiredByQuarterView(APIView):
     def get(self, request):
         try:
-            # Filtrar empleados contratados en 2021 y agrupar por departamento, trabajo, y trimestre
-            employees = Employee.objects.filter(hire_date__year=2021) \
+            # Excluir registros donde hire_date sea None y filtrar por año 2021
+            employees = Employee.objects.filter(hire_date__isnull=False, hire_date__year=2021) \
                 .annotate(quarter=ExtractQuarter('hire_date')) \
                 .values('department__name', 'job__title', 'quarter') \
                 .annotate(count=Count('id')) \
                 .order_by('department__name', 'job__title', 'quarter')
             
             # Preparar la respuesta
-            response_data = []
-            for record in employees:
-                response_data.append({
+            response_data = [
+                {
                     "department_name": record['department__name'],
                     "job_title": record['job__title'],
                     "quarter": record['quarter'],
                     "employee_count": record['count']
-                })
+                }
+                for record in employees
+            ]
             
             return Response(response_data, status=status.HTTP_200_OK)
         
