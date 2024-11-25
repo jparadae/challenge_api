@@ -2,6 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 import pandas as pd
+from django.db.models import Avg
+from django.db.models.functions import ExtractQuarter
+from django.db.models import Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -97,5 +100,81 @@ class BatchInsertView(APIView):
 
             return Response({"message": f"Data inserted into {table} successfully."}, status=status.HTTP_201_CREATED)
 
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+## 2nd Step
+class DepartmentEmployeeCountView(APIView):
+    def get(self, request):
+        try:
+            # Obtener el número de empleados contratados por cada departamento
+            departments = Department.objects.annotate(employee_count=Count('employee')).order_by('-employee_count')
+            
+            # Preparar la respuesta
+            response_data = [
+                {
+                    "department_id": department.id,
+                    "department_name": department.name,
+                    "employee_count": department.employee_count
+                }
+                for department in departments
+            ]
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class EmployeesHiredByQuarterView(APIView):
+    def get(self, request):
+        try:
+            # Filtrar empleados contratados en 2021 y agrupar por departamento, trabajo, y trimestre
+            employees = Employee.objects.filter(hire_date__year=2021) \
+                .annotate(quarter=ExtractQuarter('hire_date')) \
+                .values('department__name', 'job__title', 'quarter') \
+                .annotate(count=Count('id')) \
+                .order_by('department__name', 'job__title', 'quarter')
+            
+            # Preparar la respuesta
+            response_data = []
+            for record in employees:
+                response_data.append({
+                    "department_name": record['department__name'],
+                    "job_title": record['job__title'],
+                    "quarter": record['quarter'],
+                    "employee_count": record['count']
+                })
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class DepartmentsAboveAverageHiresView(APIView):
+    def get(self, request):
+        try:
+            # Calcular el número promedio de empleados contratados en 2021
+            average_hires = Employee.objects.filter(hire_date__year=2021) \
+                .values('department') \
+                .annotate(count=Count('id')) \
+                .aggregate(average=Avg('count'))['average']
+            
+            # Filtrar departamentos que contrataron más que la media
+            departments = Department.objects.annotate(employee_count=Count('employee')) \
+                .filter(employee_count__gt=average_hires) \
+                .order_by('name')
+            
+            # Preparar la respuesta
+            response_data = [
+                {
+                    "department_id": department.id,
+                    "department_name": department.name,
+                    "employee_count": department.employee_count
+                }
+                for department in departments
+            ]
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
