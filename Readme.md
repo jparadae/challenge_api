@@ -178,13 +178,13 @@ Haz clic en `Send` y verifica la respuesta:
  desde el directorio raíz del proyecto:
 
 ```
-   `gcloud builds submit --tag gcr.io/<your-project-id>/django-app:latest`
+   gcloud builds submit --tag gcr.io/<your-project-id>/django-app:latest
 ```
 
 Despliega la aplicación en Cloud Run con el siguiente comando:
 
 ```
-json
+
 gcloud run deploy django-app \
     --image gcr.io/<your-project-id>/django-app:latest \
     --platform managed \
