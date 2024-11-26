@@ -170,3 +170,26 @@ Haz clic en `Send` y verifica la respuesta:
         "message": "Data inserted into hired_employees successfully."
 }
 ```
+### 4. Construcción y Despliegue en Google Cloud Run
+
+# Tener previamente  `sdk google cli` para construir la imagen de Docker directamente desde el directorio raíz del proyecto:  `gcloud builds submit --tag gcr.io/<your-project-id>/django-app:latest`
+
+Despliega la aplicación en Cloud Run con el siguiente comando:
+
+```
+json
+gcloud run deploy django-app \
+    --image gcr.io/<your-project-id>/django-app:latest \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated
+
+```
+
+# Pruebas con  API
+
+```
+https://<your-cloud-run-url>/api/upload-csv/
+
+
+```
