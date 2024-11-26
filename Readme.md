@@ -172,7 +172,14 @@ Haz clic en `Send` y verifica la respuesta:
 ```
 ### 4. Construcción y Despliegue en Google Cloud Run
 
-# Tener previamente  `sdk google cli` para construir la imagen de Docker directamente desde el directorio raíz del proyecto:  `gcloud builds submit --tag gcr.io/<your-project-id>/django-app:latest`
+# Construcción imagen Docker en GCP
+
+ Tener previamente instalado el `sdk google cli` para construir la imagen de Docker directamente 
+ desde el directorio raíz del proyecto:
+
+```
+   `gcloud builds submit --tag gcr.io/<your-project-id>/django-app:latest`
+```
 
 Despliega la aplicación en Cloud Run con el siguiente comando:
 
